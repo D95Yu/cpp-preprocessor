@@ -15,7 +15,7 @@ path operator""_p(const char* data, std::size_t sz) {
 }
 
 // напишите эту функцию
-bool Preprocess(ifstream& input, ofstream&output, const path& in_file, const vector<path>&include_directories) {
+bool PreprocessInternal(ifstream& input, ofstream&output, const path& in_file, const vector<path>&include_directories) {
     static regex custom_dir(R"/(\s*#\s*include\s*"([^"]*)"\s*)/");
     static regex std_dir(R"/(\s*#\s*include\s*<([^>]*)>\s*)/");
     smatch m;
@@ -32,7 +32,7 @@ bool Preprocess(ifstream& input, ofstream&output, const path& in_file, const vec
             if (filesystem::exists(file_path)) {
                 ifstream new_input(file_path);
                 if(new_input.is_open()) {
-                    if (!Preprocess(new_input, output, file_path, include_directories)) {
+                    if (!PreprocessInternal(new_input, output, file_path, include_directories)) {
                         cout << "unknown include file "s << file_path.filename().string() 
                         << " at file "s << in_file.string() << " at line "s << str_line << "\n";
                         return false;
@@ -57,7 +57,7 @@ bool Preprocess(ifstream& input, ofstream&output, const path& in_file, const vec
                 }else {
                     ifstream new_input(file_path);
                     if (new_input.is_open()) {
-                        if (!Preprocess(new_input, output, file_path, include_directories)) {
+                        if (!PreprocessInternal(new_input, output, file_path, include_directories)) {
                             cout << "unknown include file "s << file_path.filename().string() 
                             << " at file "s << in_file.string() << " at line "s << str_line << "\n";
                             return false;
@@ -92,8 +92,11 @@ bool Preprocess(const path& in_file, const path& out_file, const vector<path>& i
         return false;
     }
     ofstream output(out_file);
+    if (!output.is_open()) {
+        return false;
+    }
 
-    return Preprocess(input, output, in_file, include_directories);
+    return PreprocessInternal(input, output, in_file, include_directories);
 }
 
 string GetFileContents(string file) {
