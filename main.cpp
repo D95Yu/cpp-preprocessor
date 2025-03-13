@@ -14,7 +14,6 @@ path operator""_p(const char* data, std::size_t sz) {
     return path(data, data + sz);
 }
 
-// напишите эту функцию
 bool PreprocessInternal(ifstream& input, ofstream&output, const path& in_file, const vector<path>&include_directories) {
     static regex custom_dir(R"/(\s*#\s*include\s*"([^"]*)"\s*)/");
     static regex std_dir(R"/(\s*#\s*include\s*<([^>]*)>\s*)/");
@@ -102,7 +101,6 @@ bool Preprocess(const path& in_file, const path& out_file, const vector<path>& i
 string GetFileContents(string file) {
     ifstream stream(file);
 
-    // конструируем string по двум итераторам
     return {(istreambuf_iterator<char>(stream)), istreambuf_iterator<char>()};
 }
 
